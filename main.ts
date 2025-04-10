@@ -11,8 +11,8 @@ import { HTTPException } from "hono/http-exception";
 import { handle } from "hono/aws-lambda"
 
 import users from "./routes/users.ts";
-// import tags from "./routes/tags.ts";
-// import ideas from "./routes/ideas.ts";
+import tags from "./routes/tags.ts";
+import ideas from "./routes/ideas.ts";
 import sql from "./db.ts";
 
 const app = new Hono();
@@ -104,8 +104,8 @@ app.get(
 );
 
 app.route("/", users);
-// app.route("/", tags);
-// app.route("/", ideas);
+app.route("/", tags);
+app.route("/", ideas);
 
 app.get(
 	"/doc",
