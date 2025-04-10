@@ -121,10 +121,10 @@ app.get(
 					url: "http://localhost:8000",
 					description: "Local server",
 				},
-				// {
-				//   url: "https://api.ideas.com",
-				//   description: "Production server",
-				// },
+				{
+					url: "https://feedback-server-5mu9.onrender.com",
+					description: "Production server",
+				},
 			],
 		},
 	}),
