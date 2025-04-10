@@ -1,0 +1,27 @@
+{
+  "name": "feedback_server",
+  "private": true,
+  "scripts": {
+    "start": "bun run main.ts",
+    "dev": "bun run --watch *.ts main.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "1.2.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.5.1",
+    "@hono/zod-validator": "^0.4.3",
+    "@scalar/hono-api-reference": "^0.7.4",
+    "aws-cdk-lib": "^2.187.0",
+    "constructs": "^10.4.2",
+    "hono": "^4.7.5",
+    "hono-openapi": "^0.4.6",
+    "postgres": "3.4.0",
+    "zod": "^3.24.2",
+    "zod-openapi": "^4.2.4"
+  }
+}

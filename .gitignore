@@ -1,0 +1,6 @@
+duck.db
+duck.db.wal
+*.env
+*.dbcnb
+.vscode
+node_modules
