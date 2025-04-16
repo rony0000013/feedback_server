@@ -14,7 +14,7 @@ import users from "./routes/users.ts";
 import tags from "./routes/tags.ts";
 import ideas from "./routes/ideas.ts";
 import groups from "./routes/groups.ts";
-import { color } from "bun";
+import feedbacks from "./routes/feedbacks.ts";
 
 
 const app = new Hono();
@@ -110,6 +110,7 @@ app.route("/", users);
 app.route("/", tags);
 app.route("/", ideas);
 app.route("/", groups);
+app.route("/", feedbacks);
 
 app.get(
 	"/doc",
