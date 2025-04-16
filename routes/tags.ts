@@ -4,7 +4,7 @@ import { z } from "zod";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator as zValidator } from "hono-openapi/zod";
 import { HTTPException } from "hono/http-exception";
-import sql from "../db.ts";
+import { sql } from "../db.ts";
 import { error404, error500, json200, resp200 } from "./error.ts";
 
 const app = new Hono();

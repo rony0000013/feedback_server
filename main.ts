@@ -8,12 +8,14 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { describeRoute, openAPISpecs } from "hono-openapi";
 import { resolver, validator as zValidator } from "hono-openapi/zod";
 import { HTTPException } from "hono/http-exception";
-import { handle } from "hono/aws-lambda"
+import { handle } from "hono/aws-lambda";
 
 import users from "./routes/users.ts";
 import tags from "./routes/tags.ts";
 import ideas from "./routes/ideas.ts";
-import sql from "./db.ts";
+import groups from "./routes/groups.ts";
+import { color } from "bun";
+
 
 const app = new Hono();
 app.use(logger());
@@ -80,6 +82,7 @@ app.get(
 	describeRoute({
 		method: "get",
 		path: "/",
+		tags: ["default"],
 		description: "Say hello to the user",
 		request: {
 			query: resolver(querySchema),
@@ -106,6 +109,7 @@ app.get(
 app.route("/", users);
 app.route("/", tags);
 app.route("/", ideas);
+app.route("/", groups);
 
 app.get(
 	"/doc",
@@ -126,10 +130,35 @@ app.get(
 					description: "Production server",
 				},
 			],
+			tags: [
+				{
+					name: "default",
+					description: "Default routes",
+				},
+				{
+					name: "users",
+					description: "User management",
+				},
+				{
+					name: "tags",
+					description: "Tag management",
+				},
+				{
+					name: "ideas",
+					description: "Idea management",
+				},
+				{
+					name: "groups",
+					description: "Group management",
+				},
+				{
+					name: "feedbacks",
+					description: "Feedback management",
+				},
+			],
 		},
 	}),
 );
-
 
 export const handler = handle(app);
 

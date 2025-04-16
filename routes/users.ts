@@ -1,11 +1,13 @@
 import { Hono } from "hono";
+import { env } from "hono/adapter";
 import "zod-openapi/extend";
 import { z } from "zod";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator as zValidator } from "hono-openapi/zod";
 import { HTTPException } from "hono/http-exception";
-import sql from "../db.ts";
+import {sql, s3} from "../db.ts";
 import { error404, error500, json200, resp200 } from "./error.ts";
+
 
 const app = new Hono();
 
@@ -304,5 +306,62 @@ app.delete(
     return c.body(null, 200);
   },
 );
+
+app.post(
+  "users/:id",
+  describeRoute({
+    method: "post",
+    path: "/users/:id",
+    tags: ["users"],
+    description: "Add or replace an image to a user",
+    parameter: id_param,
+    content: {
+      "multipart/form-data": {
+        schema: resolver(z.object({
+          image: z.any().openapi({
+            description: "Image file",
+            type: "string",
+            format: "binary",
+          }),
+        })),
+      },
+    },
+    responses: {
+      200: json200(z.object({
+        message: z.string().openapi({
+          example: "Image updated"
+        }),
+      })),
+      404: error404,
+      500: error500,
+    },
+  }),
+  zValidator("param", z.object({ id: z.string() })),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const body = await c.req.parseBody();
+    const image_file = body.image as File;
+    const { AWS_BUCKET_NAME } = env<{ AWS_BUCKET_NAME: string}>(c);
+
+    const previous_file = (await sql`SELECT image_url FROM users WHERE id = ${id}`)[0]?.image_url as string;
+    if (previous_file) {
+      const previous_s3_file = s3.file(previous_file);
+      await previous_s3_file.delete();
+    }
+    
+    const image = s3.file(`${id}_${image_file.name}`)
+
+    await image.write(await image_file.arrayBuffer());
+    const image_url = `https://${AWS_BUCKET_NAME}.s3.us-east-1.amazonaws.com/${id}_${image_file.name}`;
+    const rows = await sql`
+      UPDATE users SET image_url = ${image_url} WHERE id = ${id} RETURNING *;
+    `;
+    if (rows.length === 0) {
+      throw new HTTPException(404, { message: "User not found" });
+    }
+    return c.json({ message: "Image updated" });
+  },
+
+)
 
 export default app;

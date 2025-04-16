@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users_pinned_tags (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS groups (
+CREATE TABLE IF NOT EXISTS user_groups (
     id SERIAL PRIMARY KEY,
     title TEXT,
     description TEXT,

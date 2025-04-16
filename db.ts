@@ -1,16 +1,38 @@
+import { S3Client } from "bun";
 import postgres from "postgres";
 
 if (!process.env.PGURL) {
     throw new Error("PGURL is not defined");
 }
 
-const sql = postgres(process.env.PGURL, {
+if (!process.env.AWS_ACCESS_KEY_ID) {
+    throw new Error("AWS_ACCESS_KEY_ID is not defined");
+}
+
+if (!process.env.AWS_SECRET_ACCESS_KEY) {
+    throw new Error("AWS_SECRET_ACCESS_KEY is not defined");
+}
+
+if (!process.env.AWS_BUCKET_NAME) {
+    throw new Error("AWS_BUCKET_NAME is not defined");
+}
+
+export const sql = postgres(process.env.PGURL, {
     ssl: {
         rejectUnauthorized: false,
     },
 });
 
-// await Promise.all([
+export const s3 = new S3Client({
+	region: "us-east-1",
+	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	bucket: process.env.AWS_BUCKET_NAME,
+    acl: "public-read",
+	endpoint: "https://s3.us-east-1.amazonaws.com",
+});
+
+// for (const query of [
 //     sql`
 //     CREATE TABLE IF NOT EXISTS users (
 //         id TEXT PRIMARY KEY,
@@ -35,7 +57,7 @@ const sql = postgres(process.env.PGURL, {
 //         FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 //     );`,
 //     sql`
-//     CREATE TABLE IF NOT EXISTS groups (
+//     CREATE TABLE IF NOT EXISTS user_groups (
 //         id SERIAL PRIMARY KEY,
 //         title TEXT,
 //         description TEXT,
@@ -90,6 +112,6 @@ const sql = postgres(process.env.PGURL, {
 //     sql`
 //     CREATE INDEX IF NOT EXISTS tags_id_index ON tags (id);
 //     `,
-// ]);
-
-export default sql;
+// ]) {
+//     await query;
+// }
