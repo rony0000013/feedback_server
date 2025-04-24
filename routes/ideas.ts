@@ -455,7 +455,7 @@ app.post(
 		const { AWS_BUCKET_NAME } = env<{ AWS_BUCKET_NAME: string }>(c);
 		const file_name = `${id}/${file.name}`;
 		const file_url =
-			`https://${AWS_BUCKET_NAME}.s3.amazonaws.com/${file_name}`;
+			`https://${AWS_BUCKET_NAME}.fly.storage.tigris.dev/${file_name}`;
 
 		const s3file = s3.file(file_name);
 		await s3file.write(await file.arrayBuffer());
@@ -487,7 +487,7 @@ app.delete(
 		const { AWS_BUCKET_NAME } = env<{ AWS_BUCKET_NAME: string }>(c);
 		const file_name = `${id}/${file.name}`;
 		const file_url =
-			`https://${AWS_BUCKET_NAME}.s3.amazonaws.com/${file_name}`;
+			`https://${AWS_BUCKET_NAME}.fly.storage.tigris.dev/${file_name}`;
 
 		const s3file = s3.file(file_name);
 		await s3file.delete();
