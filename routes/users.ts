@@ -349,10 +349,11 @@ app.post(
       await previous_s3_file.delete();
     }
     
+    // https://feedback.fly.storage.tigris.dev/1_wallpaperflare.com_wallpaper.jpg
     const image = s3.file(`${id}_${image_file.name}`)
 
     await image.write(await image_file.arrayBuffer());
-    const image_url = `https://${AWS_BUCKET_NAME}.s3.us-east-1.amazonaws.com/${id}_${image_file.name}`;
+    const image_url = `https://${AWS_BUCKET_NAME}.fly.storage.tigris.dev/${id}_${image_file.name}`;
     const rows = await sql`
       UPDATE users SET image_url = ${image_url} WHERE id = ${id} RETURNING *;
     `;

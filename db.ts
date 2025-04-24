@@ -17,6 +17,14 @@ if (!process.env.AWS_BUCKET_NAME) {
     throw new Error("AWS_BUCKET_NAME is not defined");
 }
 
+if (!process.env.AWS_REGION) {
+    throw new Error("AWS_REGION is not defined");
+}
+
+if (!process.env.AWS_ENDPOINT_URL) {
+    throw new Error("AWS_ENDPOINT_URL is not defined");
+}
+
 export const sql = postgres(process.env.PGURL, {
     ssl: {
         rejectUnauthorized: false,
@@ -24,12 +32,12 @@ export const sql = postgres(process.env.PGURL, {
 });
 
 export const s3 = new S3Client({
-	region: "us-east-1",
+	region: process.env.AWS_REGION,
 	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
 	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 	bucket: process.env.AWS_BUCKET_NAME,
     acl: "public-read",
-	endpoint: "https://s3.us-east-1.amazonaws.com",
+	endpoint: process.env.AWS_ENDPOINT_URL,
 });
 
 // for (const query of [
