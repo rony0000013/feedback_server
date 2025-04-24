@@ -16,7 +16,6 @@ import ideas from "./routes/ideas.ts";
 import groups from "./routes/groups.ts";
 import feedbacks from "./routes/feedbacks.ts";
 
-
 const app = new Hono();
 app.use(logger());
 
@@ -78,15 +77,36 @@ app.onError((error, c) => {
 });
 
 app.get(
+	"/health",
+	describeRoute({
+		method: "get",
+		path: "/health",
+		tags: ["default"],
+		description: "Health check",
+		responses: {
+			200: {
+				description: "Successful response",
+				content: {
+					"text/plain": {
+						schema: resolver(z.string()),
+						example: "OK",
+					},
+				},
+			},
+		},
+	}),
+	async (c) => {
+		return c.text("OK", 200);
+	},
+);
+
+app.get(
 	"/",
 	describeRoute({
 		method: "get",
 		path: "/",
 		tags: ["default"],
 		description: "Say hello to the user",
-		request: {
-			query: resolver(querySchema),
-		},
 		responses: {
 			200: {
 				description: "Successful response",
