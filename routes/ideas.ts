@@ -199,36 +199,36 @@ app.get(
 	),
 	async (c) => {
 		const { sort_by, filter, access } = c.req.valid("query");
-		const sort_by_sql = sort_by ? `ORDER BY i.${sort_by}` : "";
-		const filter_sql = filter ? `WHERE t.name = '${filter}'` : "";
+		const sort_by_sql = sort_by ? sql`ORDER BY i.${sort_by}` : sql``;
+		const filter_sql = filter ? sql`WHERE t.name = ${filter}` : sql``;
 		const access_sql =
 			(access?.startsWith("private:") || access?.startsWith("group:"))
 				? filter
-					? `AND (i.access = '${access}' OR i.access = 'public')`
-					: `WHERE i.access = '${access}' OR i.access = 'public'`
-				: "";
+					? sql`AND (i.access = ${access} OR i.access = 'public')`
+					: sql`WHERE (i.access = ${access} OR i.access = 'public')`
+				: sql``;
 
 		const rows = await sql`SELECT 
-		i.id,
-		i.title,
-		i.content,
-		i.user_id,
-		COALESCE(
-			ARRAY_AGG(t.name),
-			ARRAY[]::VARCHAR[]
-		) AS tags,
-		i.files_url,
-		i.access,
-		i.upvotes,
-		i.downvotes
-		FROM ideas i
-		LEFT JOIN ideas_tags it ON i.id = it.idea_id
-		LEFT JOIN tags t ON it.tag_id = t.id
-		${filter_sql}
-		${access_sql}
-		GROUP BY i.id, i.title, i.content, i.user_id, i.files_url, i.access, i.upvotes, i.downvotes
-		${sort_by_sql};
-    `;
+			i.id,
+			i.title,
+			i.content,
+			i.user_id,
+			COALESCE(
+				ARRAY_AGG(t.name),
+				ARRAY[]::VARCHAR[]
+			) AS tags,
+			i.files_url,
+			i.access,
+			i.upvotes,
+			i.downvotes
+			FROM ideas i
+			LEFT JOIN ideas_tags it ON i.id = it.idea_id
+			LEFT JOIN tags t ON it.tag_id = t.id
+			${filter_sql}
+			${access_sql}
+			GROUP BY i.id, i.title, i.content, i.user_id, i.files_url, i.access, i.upvotes, i.downvotes
+			${sort_by_sql};
+		`;
 
 		return c.json(rows);
 	},
@@ -431,6 +431,22 @@ app.delete(
 		return c.json(rows[0]);
 	},
 );
+
+app.get("/ideas/user/:user_id", describeRoute({
+    method: "get",
+    path: "/ideas/user/:user_id",
+    tags: ["ideas"],
+    description: "Get ideas by user ID",
+    parameter: id_param,
+    responses: {
+        200: json200(z.array(ideasSchemaWithTags)),
+        500: error500,
+    },
+}), zValidator("param", z.object({ user_id: z.string() })), async (c) => {
+    const { user_id } = c.req.valid("param");
+    const rows = await sql`SELECT * FROM ideas WHERE user_id = ${user_id} ORDER BY created_at DESC`;
+    return c.json(rows);
+})
 
 app.post(
 	"/ideas/file/:id",

@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS ideas (
     access TEXT, -- 'public', 'private:user_id', 'group:group_id'
     upvotes INTEGER DEFAULT 0,
     downvotes INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS ideas_tags (
@@ -53,6 +54,7 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     user_tag TEXT NULL,
     upvotes INTEGER DEFAULT 0,
     downvotes INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (idea_id) REFERENCES ideas(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

@@ -230,4 +230,104 @@ app.delete(
     },
 );
 
+app.get("/feedbacks/user/:user_id", describeRoute({
+    method: "get",
+    path: "/feedbacks/user/:user_id",
+    tags: ["feedbacks"],
+    description: "Get feedbacks by user ID",
+    parameter: id_param,
+    responses: {
+        200: json200(z.array(feedbackSchema)),
+        500: error500,
+    },
+}), zValidator("param", z.object({ user_id: z.string() })), async (c) => {
+    const { user_id } = c.req.valid("param");
+    const rows = await sql`SELECT * FROM feedbacks WHERE user_id = ${user_id} ORDER BY created_at DESC`;
+    return c.json(rows);
+})
+
+app.post("/feedbacks/up/:id",
+    describeRoute({
+        method: "post",
+        path: "/feedbacks/up/:id",
+        tags: ["feedbacks"],
+        description: "Vote on a feedback",
+        parameters: [id_param],
+        responses: {
+            200: resp200,
+            404: error404,
+            500: error500,
+        },
+    }),
+    zValidator("param", z.object({ id: z.number() })),
+    async (c) => {
+        const { id } = c.req.valid("param");
+        await sql`UPDATE feedbacks SET upvotes = upvotes + 1 WHERE id = ${id}`;
+        return c.body(null, 200);
+    },
+)
+
+app.delete("/feedbacks/up/:id",
+    describeRoute({
+        method: "delete",
+        path: "/feedbacks/up/:id",
+        tags: ["feedbacks"],
+        description: "Remove a vote on a feedback",
+        parameters: [id_param],
+        responses: {
+            200: resp200,
+            404: error404,
+            500: error500,
+        },
+    }),
+    zValidator("param", z.object({ id: z.number() })),
+    async (c) => {
+        const { id } = c.req.valid("param");
+        await sql`UPDATE feedbacks SET upvotes = upvotes - 1 WHERE id = ${id}`;
+        return c.body(null, 200);
+    },
+)
+
+app.post("/feedbacks/down/:id",
+    describeRoute({
+        method: "post",
+        path: "/feedbacks/down/:id",
+        tags: ["feedbacks"],
+        description: "Vote on a feedback",
+        parameters: [id_param],
+        responses: {
+            200: resp200,
+            404: error404,
+            500: error500,
+        },
+    }),
+    zValidator("param", z.object({ id: z.number() })),
+    async (c) => {
+        const { id } = c.req.valid("param");
+        await sql`UPDATE feedbacks SET downvotes = downvotes + 1 WHERE id = ${id}`;
+        return c.body(null, 200);
+    },
+)
+
+app.delete("/feedbacks/down/:id",
+    describeRoute({
+        method: "delete",
+        path: "/feedbacks/down/:id",
+        tags: ["feedbacks"],
+        description: "Remove a vote on a feedback",
+        parameters: [id_param],
+        responses: {
+            200: resp200,
+            404: error404,
+            500: error500,
+        },
+    }),
+    zValidator("param", z.object({ id: z.number() })),
+    async (c) => {
+        const { id } = c.req.valid("param");
+        await sql`UPDATE feedbacks SET downvotes = downvotes - 1 WHERE id = ${id}`;
+        return c.body(null, 200);
+    },
+)
+
 export default app;
